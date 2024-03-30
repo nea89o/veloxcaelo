@@ -1,0 +1,12 @@
+[
+  {
+    "modid": "veloxcaelo",
+    "name": "Velox Caelo",
+    "description": "The sky is not the limit",
+    "version": "1.0.0",
+    "mcversion": "1.8.9",
+    "authorList": [
+      "Linnea Gräf"
+    ]
+  }
+]

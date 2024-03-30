@@ -1,0 +1,9 @@
+{
+  "package": "moe.nea.caelo.mixin",
+  "refmap": "mixins.veloxcaelo.refmap.json",
+  "plugin": "moe.nea.caelo.init.MixinPlugin",
+  "minVersion": "0.7",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ]
+}
