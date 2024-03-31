@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import xyz.wagyourtail.unimined.api.minecraft.task.RemapJarTask
 
 plugins {
     kotlin("jvm") version "1.9.22"
@@ -29,10 +30,12 @@ unimined.minecraft {
     }
     runs {
         this.config("client") {
-            this.args.addAll(listOf(
-                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker",
-                "--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker",
-            ))
+            this.args.addAll(
+                listOf(
+                    "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker",
+                    "--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker",
+                )
+            )
             this.env.put(
                 "LD_LIBRARY_PATH",
                 ":/nix/store/agp6lqznayysqvqkx4k1ggr8n1rsyi8c-gcc-13.2.0-lib/lib:/nix/store/ldi0rb00gmbdg6915lhch3k3b3ib460z-libXcursor-1.2.2/lib:/nix/store/8xbbv82pabjcbj30vrna4gcz4g9q97z4-libXrandr-1.5.4/lib:/nix/store/smrb2g0addhgahkfjjl3k8rfd30gdc29-libXxf86vm-1.1.5/lib:/nix/store/lpqy1z1h8li6h3cp9ax6vifl71dks1ff-libglvnd-1.7.0/lib"
@@ -113,11 +116,13 @@ tasks.withType(Jar::class) {
         this["MixinConfigs"] = "veloxcaelo.mixins.json"
     }
 }
-
-
 tasks.shadowJar {
     archiveClassifier.set("dep-dev")
     configurations = listOf(shadowImpl, shadowModImpl)
-    relocate("io.github.notenoughupdates.moulconfig","moe.nea.velox.moulconfig")
+    relocate("io.github.notenoughupdates.moulconfig", "moe.nea.velox.moulconfig")
     mergeServiceFiles()
+}
+tasks.named<RemapJarTask>("remapJar") {
+    this.inputFile.set(tasks.shadowJar.flatMap { it.archiveFile })
+    dependsOn((tasks.shadowJar))
 }
