@@ -19,7 +19,7 @@ object OptifineCustomItemCache {
             MC.display("- History: §3${cacheSizeHistory.size}")
             MC.display("- Misses: §c${cache.cacheMisses}")
             MC.display("- Hits: §a${cache.cacheHits}")
-            MC.display("- Entries: §b${cache.uniquePropertyBearingStacks}")
+            MC.display("- Matches: §b${cache.uniquePropertyBearingStacks}")
         }
     }
 
