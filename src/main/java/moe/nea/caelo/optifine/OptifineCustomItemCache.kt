@@ -1,6 +1,7 @@
 package moe.nea.caelo.optifine
 
 import moe.nea.caelo.CaeloCommand
+import moe.nea.caelo.config.CConfig
 import moe.nea.caelo.event.NeaTickEvent
 import moe.nea.caelo.util.Histogram
 import moe.nea.caelo.util.MC
@@ -56,6 +57,8 @@ object OptifineCustomItemCache {
         type: Int,
         cir: CallbackInfoReturnable<CustomItemProperties?>
     ) {
+        if (!CConfig.config.optiCache.citCache)
+            return
         val key = CacheKey(itemStack, type)
         if (!map.containsKey(key)) {
             cacheStats.cacheMisses++

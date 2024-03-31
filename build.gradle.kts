@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.22"
     `maven-publish`
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("xyz.wagyourtail.unimined") version "1.2.0-SNAPSHOT"
 }
 
@@ -12,6 +13,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     maven("https://jitpack.io")
     maven("https://repo.polyfrost.cc/releases")
+    maven("https://maven.notenoughupdates.org/releases/")
     mavenCentral()
 }
 
@@ -27,7 +29,10 @@ unimined.minecraft {
     }
     runs {
         this.config("client") {
-            this.args.addAll(listOf("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"))
+            this.args.addAll(listOf(
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker",
+                "--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker",
+            ))
             this.env.put(
                 "LD_LIBRARY_PATH",
                 ":/nix/store/agp6lqznayysqvqkx4k1ggr8n1rsyi8c-gcc-13.2.0-lib/lib:/nix/store/ldi0rb00gmbdg6915lhch3k3b3ib460z-libXcursor-1.2.2/lib:/nix/store/8xbbv82pabjcbj30vrna4gcz4g9q97z4-libXrandr-1.5.4/lib:/nix/store/smrb2g0addhgahkfjjl3k8rfd30gdc29-libXxf86vm-1.1.5/lib:/nix/store/lpqy1z1h8li6h3cp9ax6vifl71dks1ff-libglvnd-1.7.0/lib"
@@ -51,10 +56,17 @@ val downloadOptifine by tasks.creating {
             }
     }
 }
+val shadowModImpl by configurations.creating {
+    configurations.named("modImplementation").get().extendsFrom(this)
+}
+val shadowImpl by configurations.creating {
+    configurations.implementation.get().extendsFrom(this)
+}
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    shadowModImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.5")
     compileOnly(project.files(downloadOptifine))
     compileOnly("org.jetbrains:annotations:24.1.0")
 }
@@ -69,11 +81,7 @@ sourceSets.main {
 }
 tasks.processResources {
     filesMatching("*.mixins.json") {
-        this.filter(
-            mapOf("sourceRoots" to sourceSets.main.get().allSource.srcDirs
-                .filter { it.exists() }.joinToString(":") { it.absolutePath }),
-            MixinFilterReader::class.java
-        )//TODO: keep old existing class names in mixins array
+        this.autoDiscoverMixins(sourceSets.main.get())
     }
 }
 
@@ -104,4 +112,12 @@ tasks.withType(Jar::class) {
         this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
         this["MixinConfigs"] = "veloxcaelo.mixins.json"
     }
+}
+
+
+tasks.shadowJar {
+    archiveClassifier.set("dep-dev")
+    configurations = listOf(shadowImpl, shadowModImpl)
+    relocate("io.github.notenoughupdates.moulconfig","moe.nea.velox.moulconfig")
+    mergeServiceFiles()
 }

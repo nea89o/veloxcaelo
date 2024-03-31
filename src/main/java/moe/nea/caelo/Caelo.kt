@@ -6,6 +6,7 @@ import moe.nea.caelo.optifine.OptifineCustomItemCache
 import moe.nea.caelo.util.InterModUtil
 import moe.nea.caelo.util.MC
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
@@ -23,6 +24,14 @@ class Caelo {
         if (Minecraft.getMinecraft().thePlayer == null)
             return
         MinecraftForge.EVENT_BUS.post(NeaTickEvent(tickCount++))
+        if (toOpen != null) {
+            Minecraft.getMinecraft().displayGuiScreen(toOpen)
+            toOpen = null
+        }
+    }
+
+    companion object {
+        var toOpen: GuiScreen? = null
     }
 
     var tickCount = 0

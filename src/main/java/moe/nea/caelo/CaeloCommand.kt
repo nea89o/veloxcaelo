@@ -1,5 +1,6 @@
 package moe.nea.caelo
 
+import moe.nea.caelo.config.CConfig
 import moe.nea.caelo.util.MC
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -41,7 +42,7 @@ object CaeloCommand : CommandBase() {
 
     override fun processCommand(iCommandSender: ICommandSender?, args: Array<String>) {
         if (args.isEmpty()) {
-            MC.display("§cMissing subcommand. Check the tab completions.")
+            Caelo.toOpen = CConfig.managed.getGui()
             return
         }
         val subCommand = subcommands[args[0]]
