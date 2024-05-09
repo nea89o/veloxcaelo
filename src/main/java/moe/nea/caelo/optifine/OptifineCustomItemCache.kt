@@ -26,18 +26,22 @@ object OptifineCustomItemCache {
 		}
 	}
 
-	class CacheKey(val itemStack: WeakReference<ItemStack>, val type: Int) {
+	class CacheKey(itemStack: ItemStack, val type: Int) {
+		val hashCode = System.identityHashCode(itemStack) * 31 + type
+		val ref = WeakReference(itemStack)
+
 		override fun equals(other: Any?): Boolean {
+			if (other === this) return true
 			if (other !is CacheKey) return false
-			return itemStack.get() === other.itemStack.get() && type == other.type
+			return ref.get() === other.ref.get() && type == other.type
 		}
 
 		override fun hashCode(): Int {
-			return System.identityHashCode(itemStack.get()) * 31 + type
+			return hashCode
 		}
 
 		fun isPresent(): Boolean {
-			return itemStack.get() != null
+			return ref.get() != null
 		}
 	}
 
@@ -56,20 +60,17 @@ object OptifineCustomItemCache {
 	@SubscribeEvent
 	fun onTick(event: NeaTickEvent) {
 		var removeCount = 0
-		val nextMap = mutableMapOf<CacheKey, CustomItemProperties?>()
-		for (entry in map) {
-			if (entry.key.isPresent()) {
-				nextMap[entry.key] = entry.value
-			} else {
+		val it = map.iterator()
+		while (it.hasNext()) {
+			if (!it.next().key.isPresent()) {
+				it.remove()
 				removeCount++
 			}
 		}
-		map = nextMap
 		cacheStats.size = map.size
 		cacheStats.removals = removeCount
 		cacheSizeHistory.append(cacheStats)
 		cacheStats = CacheStats()
-
 	}
 
 	@JvmStatic
@@ -80,7 +81,7 @@ object OptifineCustomItemCache {
 	) {
 		if (!CConfig.config.optiCache.citCache)
 			return
-		val key = CacheKey(WeakReference(itemStack), type)
+		val key = CacheKey(itemStack, type)
 		if (!map.containsKey(key)) {
 			cacheStats.cacheMisses++
 			return
@@ -91,13 +92,13 @@ object OptifineCustomItemCache {
 
 	@JvmStatic
 	fun storeCustomItemProperties(itemStack: ItemStack, type: Int, cip: CustomItemProperties) {
-		map[CacheKey(WeakReference(itemStack), type)] = cip
+		map[CacheKey(itemStack, type)] = cip
 		cacheStats.insertions++
 	}
 
 	@JvmStatic
 	fun storeNoCustomItemProperties(itemStack: ItemStack, type: Int) {
-		map[CacheKey(WeakReference(itemStack), type)] = null
+		map[CacheKey(itemStack, type)] = null
 		cacheStats.insertions++
 	}
 }
