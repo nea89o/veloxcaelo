@@ -15,39 +15,39 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
-@Mod(modid = "veloxcaelo", useMetadata = true)
+@Mod(modid = "veloxcaelo", useMetadata = true, version = "1.0.1")
 class Caelo {
-    @SubscribeEvent
-    fun onTick(tick: ClientTickEvent) {
-        if (tick.phase != TickEvent.Phase.END)
-            return
-        if (Minecraft.getMinecraft().thePlayer == null)
-            return
-        MinecraftForge.EVENT_BUS.post(NeaTickEvent(tickCount++))
-        if (toOpen != null) {
-            Minecraft.getMinecraft().displayGuiScreen(toOpen)
-            toOpen = null
-        }
-    }
+	@SubscribeEvent
+	fun onTick(tick: ClientTickEvent) {
+		if (tick.phase != TickEvent.Phase.END)
+			return
+		if (Minecraft.getMinecraft().thePlayer == null)
+			return
+		MinecraftForge.EVENT_BUS.post(NeaTickEvent(tickCount++))
+		if (toOpen != null) {
+			Minecraft.getMinecraft().displayGuiScreen(toOpen)
+			toOpen = null
+		}
+	}
 
-    companion object {
-        var toOpen: GuiScreen? = null
-    }
+	companion object {
+		var toOpen: GuiScreen? = null
+	}
 
-    var tickCount = 0
+	var tickCount = 0
 
-    @Mod.EventHandler
-    fun onInit(event: FMLInitializationEvent) {
-        if (InterModUtil.isOptifineLoaded) {
-            MinecraftForge.EVENT_BUS.register(OptifineCustomItemCache)
-        }
-        MinecraftForge.EVENT_BUS.register(this)
-        ClientCommandHandler.instance.registerCommand(CaeloCommand)
-        CaeloCommand.subcommand("mixins") { args ->
-            MC.display("Injected mixins:")
-            MixinPlugin.loadedMixinClasses.forEach {
-                MC.display(" - $it")
-            }
-        }
-    }
+	@Mod.EventHandler
+	fun onInit(event: FMLInitializationEvent) {
+		if (InterModUtil.isOptifineLoaded) {
+			MinecraftForge.EVENT_BUS.register(OptifineCustomItemCache)
+		}
+		MinecraftForge.EVENT_BUS.register(this)
+		ClientCommandHandler.instance.registerCommand(CaeloCommand)
+		CaeloCommand.subcommand("mixins") { args ->
+			MC.display("Injected mixins:")
+			MixinPlugin.loadedMixinClasses.forEach {
+				MC.display(" - $it")
+			}
+		}
+	}
 }
