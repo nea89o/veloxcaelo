@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
-@Mod(modid = "veloxcaelo", useMetadata = true, version = "1.0.1")
+@Mod(modid = "veloxcaelo", useMetadata = true, version = "1.0.2")
 class Caelo {
 	@SubscribeEvent
 	fun onTick(tick: ClientTickEvent) {
