@@ -7,5 +7,20 @@ This mod needs **[OptiFine](https://optifine.net/downloads)** and Forge to do an
 Put OptiFine and this mod ([download here](https://github.com/nea89o/veloxcaelo/releases)) to your mod folder.
 
 
+<details>
+
+<summary>Images</summary>
+
+### Before
+
+![](docs/before.png)
+
+
+### After
+
+![](docs/after.png)
+
+</details>
+
 
 
