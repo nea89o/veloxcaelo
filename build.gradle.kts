@@ -16,6 +16,18 @@ repositories {
     maven("https://repo.polyfrost.cc/releases")
     maven("https://maven.notenoughupdates.org/releases/")
     mavenCentral()
+    maven("https://nea.moe/redir-repo") {
+        metadataSources { artifact() }
+        content {
+            includeGroup("optifine")
+        }
+    }
+}
+
+val optifineConfig by configurations.creating {
+}
+configurations.compileOnly {
+    extendsFrom(optifineConfig)
 }
 
 unimined.minecraft {
@@ -28,10 +40,16 @@ unimined.minecraft {
         loader("11.15.1.2318-1.8.9")
         mixinConfig("veloxcaelo.mixins.json")
     }
+    mods {
+        remap(optifineConfig) {
+            namespace("official")
+        }
+    }
     runs {
         this.config("client") {
             this.args.addAll(
                 listOf(
+                    "--mods", optifineConfig.resolve().joinToString(",") { it.toRelativeString(this.workingDir) },
                     "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker",
                     "--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker",
                 )
@@ -45,20 +63,6 @@ unimined.minecraft {
 }
 
 
-val downloadOptifine by tasks.creating {
-    val outputFile = layout.buildDirectory.file("download/optifine.jar")
-    outputs.file(outputFile)
-    doLast {
-        outputFile.get().asFile.parentFile.mkdirs()
-        uri("https://optifine.net/download?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
-            .toURL()
-            .openStream().use { input ->
-                outputFile.get().asFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-    }
-}
 val shadowModImpl by configurations.creating {
     configurations.named("modImplementation").get().extendsFrom(this)
 }
@@ -69,8 +73,8 @@ val shadowImpl by configurations.creating {
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT")
-    shadowModImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.5")
-    compileOnly(project.files(downloadOptifine))
+    shadowModImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.7")
+    optifineConfig("optifine:optifine:1.8.9")
     compileOnly("org.jetbrains:annotations:24.1.0")
 }
 
