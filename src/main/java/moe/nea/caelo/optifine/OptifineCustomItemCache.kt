@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.optifine.CustomItemProperties
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 
 object OptifineCustomItemCache {
@@ -26,9 +27,14 @@ object OptifineCustomItemCache {
 		}
 	}
 
+	val referenceQueue = ReferenceQueue<ItemStack>()
+
+	class CacheKeyReference(val cacheKey: CacheKey, itemStack: ItemStack) :
+		WeakReference<ItemStack>(itemStack, referenceQueue)
+
 	class CacheKey(itemStack: ItemStack, val type: Int) {
 		val hashCode = System.identityHashCode(itemStack) * 31 + type
-		val ref = WeakReference(itemStack)
+		val ref = CacheKeyReference(this, itemStack)
 
 		override fun equals(other: Any?): Boolean {
 			if (other === this) return true
@@ -60,12 +66,10 @@ object OptifineCustomItemCache {
 	@SubscribeEvent
 	fun onTick(event: NeaTickEvent) {
 		var removeCount = 0
-		val it = map.iterator()
-		while (it.hasNext()) {
-			if (!it.next().key.isPresent()) {
-				it.remove()
-				removeCount++
-			}
+		while (true) {
+			val ref = referenceQueue.poll() as CacheKeyReference? ?: break
+			removeCount++
+			map.remove(ref.cacheKey)
 		}
 		cacheStats.size = map.size
 		cacheStats.removals = removeCount
