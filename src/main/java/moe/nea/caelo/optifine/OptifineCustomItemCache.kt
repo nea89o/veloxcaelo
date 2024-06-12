@@ -24,6 +24,7 @@ object OptifineCustomItemCache {
 			MC.display("- Insertions: §b${cache.insertions}")
 			MC.display("- Evictions: §b${cache.removals}")
 			MC.display("- Cache Size: §b${cache.size}")
+			OptifineRegexCache.printStats()
 		}
 	}
 

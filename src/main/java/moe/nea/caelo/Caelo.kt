@@ -1,12 +1,14 @@
 package moe.nea.caelo
 
 import moe.nea.caelo.event.NeaTickEvent
+import moe.nea.caelo.event.ResourceReloadEvent
 import moe.nea.caelo.init.MixinPlugin
 import moe.nea.caelo.optifine.OptifineCustomItemCache
 import moe.nea.caelo.util.InterModUtil
 import moe.nea.caelo.util.MC
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.resources.IReloadableResourceManager
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
@@ -42,6 +44,9 @@ class Caelo {
 			MinecraftForge.EVENT_BUS.register(OptifineCustomItemCache)
 		}
 		MinecraftForge.EVENT_BUS.register(this)
+		(Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener {
+			MinecraftForge.EVENT_BUS.post(ResourceReloadEvent())
+		}
 		ClientCommandHandler.instance.registerCommand(CaeloCommand)
 		CaeloCommand.subcommand("mixins") { args ->
 			MC.display("Injected mixins:")
