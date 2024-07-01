@@ -29,6 +29,6 @@ jobs:
           modrinth-id: r4AQF5mj
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: 'build/-libs/*.jar'
+          files: 'build/libs/*.jar'
           loaders: forge
           game-versions: 1.8.9
