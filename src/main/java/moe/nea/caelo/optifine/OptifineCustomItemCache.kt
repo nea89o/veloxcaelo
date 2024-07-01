@@ -3,6 +3,8 @@ package moe.nea.caelo.optifine
 import moe.nea.caelo.CaeloCommand
 import moe.nea.caelo.config.CConfig
 import moe.nea.caelo.event.NeaTickEvent
+import moe.nea.caelo.event.ResourceReloadEvent
+import moe.nea.caelo.optifine.OptifineRegexCache.cache
 import moe.nea.caelo.util.Histogram
 import moe.nea.caelo.util.MC
 import net.minecraft.item.ItemStack
@@ -63,6 +65,11 @@ object OptifineCustomItemCache {
 	private var map = mutableMapOf<CacheKey, CustomItemProperties?>()
 	private val cacheSizeHistory = Histogram<CacheStats>(1000)
 	private var cacheStats = CacheStats()
+
+	@SubscribeEvent
+	fun onResourcePackReload(resourceReload: ResourceReloadEvent) {
+		map.clear()
+	}
 
 	@SubscribeEvent
 	fun onTick(event: NeaTickEvent) {
