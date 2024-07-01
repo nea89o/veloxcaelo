@@ -1,8 +1,6 @@
 name: Run Gradle Build
 on:
-  push:
-    tags:
-      - '*'
+  - push
 
 jobs:
   build:
