@@ -1,0 +1,34 @@
+name: Upload release files
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Java
+        uses: actions/setup-java@v4.0.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Execute Gradle build
+        run: ./gradlew clean build
+
+      - uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: r4AQF5mj
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          files: 'build/-libs/*.jar'
+          loaders: forge
+          game-versions: 1.8.9

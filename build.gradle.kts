@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import xyz.wagyourtail.unimined.api.minecraft.task.RemapJarTask
+import java.io.ByteArrayOutputStream
 
 plugins {
 	kotlin("jvm") version "1.9.22"
@@ -8,8 +9,24 @@ plugins {
 	id("xyz.wagyourtail.unimined") version "1.2.0-SNAPSHOT"
 }
 
+
+fun cmd(vararg args: String): String? {
+	val output = ByteArrayOutputStream()
+	val r = exec {
+		this.commandLine(args.toList())
+		this.isIgnoreExitValue = true
+		this.standardOutput = output
+		this.errorOutput = ByteArrayOutputStream()
+	}
+	return if (r.exitValue == 0) output.toByteArray().decodeToString().trim()
+	else null
+}
+
+val tag = cmd("git", "describe", "--tags", "HEAD")
+val hash = cmd("git", "rev-parse", "--short", "HEAD")!!
+val isSnapshot = tag == null || hash in tag
 group = "moe.nea"
-version = "1.0.2"
+version = (if (isSnapshot) hash else tag!!)
 
 repositories {
 	maven("https://jitpack.io")
