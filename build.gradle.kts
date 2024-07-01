@@ -30,8 +30,8 @@ version = (if (isSnapshot) hash else tag!!)
 
 repositories {
 	maven("https://jitpack.io")
-	maven("https://repo.polyfrost.cc/releases")
 	maven("https://maven.notenoughupdates.org/releases/")
+	maven("https://repo.spongepowered.org/maven/")
 	mavenCentral()
 	maven("https://nea.moe/redir-repo") {
 		metadataSources { artifact() }
